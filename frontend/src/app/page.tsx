@@ -1,12 +1,19 @@
+"use client"
+
 import React from 'react'
 import HomePage from './(pages)/home/page'
+import LoginPage from './(pages)/login/page'
+import { useAuth } from '@/context/AuthContext'
 
-const page = () => {
+const Page = () => {
+
+  const { isLoggedIn } = useAuth();
+
   return (
     <div>
-      <HomePage />
+      {isLoggedIn ? <HomePage /> : <LoginPage />}
     </div>
   )
 }
 
-export default page
+export default Page

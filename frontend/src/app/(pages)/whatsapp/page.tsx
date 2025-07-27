@@ -1,10 +1,9 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react';
-import { Send, Mic, Phone } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Send, Mic, Phone, Bot, User, Clock, CheckCheck } from 'lucide-react';
 import { useApp } from '../../../context/AppContext';
 import Header from '@/components/Header';
-
 
 interface Message {
   id: string;
@@ -20,8 +19,8 @@ const WhatsAppPage: React.FC = () => {
     {
       id: '1',
       text: language === 'hi'
-        ? 'नमस्ते! मैं उदान बाज़ार बॉट हूँ। मैं आपकी मदद कर सकता हूँ:\n\n• कच्चे माल की कीमत देखना\n• ऑर्डर देना\n• डिलीवरी ट्रैक करना\n\nआप मुझसे हिंदी या अंग्रेजी में बात कर सकते हैं!'
-        : 'Hello! I\'m UdaanBazaar Bot. I can help you with:\n\n• Check raw material prices\n• Place orders\n• Track deliveries\n\nYou can chat with me in Hindi or English!',
+        ? 'नमस्ते! मैं उदान बाज़ार बॉट हूँ...'
+        : 'Hello! I\'m UdaanBazaar Bot...',
       sender: 'bot',
       timestamp: new Date(),
       buttons: [
@@ -32,37 +31,40 @@ const WhatsAppPage: React.FC = () => {
     }
   ]);
   const [inputText, setInputText] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSendMessage = () => {
     if (!inputText.trim()) return;
-
     const userMessage: Message = {
       id: Date.now().toString(),
       text: inputText,
       sender: 'user',
       timestamp: new Date()
     };
-
     setMessages(prev => [...prev, userMessage]);
-
-    // Simulate bot response
     setTimeout(() => {
       const botResponse = getBotResponse(inputText);
       setMessages(prev => [...prev, botResponse]);
     }, 1000);
-
     setInputText('');
   };
 
   const getBotResponse = (userInput: string): Message => {
     const input = userInput.toLowerCase();
-
-    if (input.includes('आलू') || input.includes('potato') || input.includes('aalu')) {
+    if (input.includes('potato') || input.includes('आलू')) {
       return {
         id: Date.now().toString(),
         text: language === 'hi'
-          ? '🥔 आलू की आज की कीमतें:\n\n• Farm Direct: ₹22/kg (2.8km दूर)\n• Veggie Fresh: ₹25/kg (1.5km दूर)\n• Punjab Potatoes: ₹22/kg (3.5km दूर)\n\nसबसे सस्ता विकल्प Farm Direct है!'
-          : '🥔 Today\'s Potato Prices:\n\n• Farm Direct: ₹22/kg (2.8km away)\n• Veggie Fresh: ₹25/kg (1.5km away)\n• Punjab Potatoes: ₹22/kg (3.5km away)\n\nBest deal: Farm Direct!',
+          ? '🥔 आलू की आज की कीमतें: ...'
+          : '🥔 Today\'s Potato Prices: ...',
         sender: 'bot',
         timestamp: new Date(),
         buttons: [
@@ -71,13 +73,12 @@ const WhatsAppPage: React.FC = () => {
         ]
       };
     }
-
-    if (input.includes('प्याज') || input.includes('onion') || input.includes('pyaaz')) {
+    if (input.includes('onion') || input.includes('प्याज')) {
       return {
         id: Date.now().toString(),
         text: language === 'hi'
-          ? '🧅 प्याज की आज की कीमतें:\n\n• Veggie Fresh: ₹35/kg (1.5km दूर)\n• Farm Direct: ₹32/kg (2.8km दूर)\n\nFarm Direct से खरीदें और ₹3/kg बचाएं!'
-          : '🧅 Today\'s Onion Prices:\n\n• Veggie Fresh: ₹35/kg (1.5km away)\n• Farm Direct: ₹32/kg (2.8km away)\n\nSave ₹3/kg with Farm Direct!',
+          ? '🧅 प्याज की आज की कीमतें: ...'
+          : '🧅 Today\'s Onion Prices: ...',
         sender: 'bot',
         timestamp: new Date(),
         buttons: [
@@ -86,13 +87,12 @@ const WhatsAppPage: React.FC = () => {
         ]
       };
     }
-
     if (input.includes('order') || input.includes('ऑर्डर')) {
       return {
         id: Date.now().toString(),
         text: language === 'hi'
-          ? '✅ आपका ऑर्डर सफलतापूर्वक दर्ज हो गया!\n\n📦 ऑर्डर ID: #OR12345\n🚚 डिलीवरी: 2-4 घंटे में\n💰 कुल राशि: ₹150\n\nआप अपना ऑर्डर ट्रैक कर सकते हैं।'
-          : '✅ Your order has been placed successfully!\n\n📦 Order ID: #OR12345\n🚚 Delivery: 2-4 hours\n💰 Total: ₹150\n\nYou can track your order now.',
+          ? '✅ आपका ऑर्डर सफलतापूर्वक दर्ज हो गया! ...'
+          : '✅ Your order has been placed successfully! ...',
         sender: 'bot',
         timestamp: new Date(),
         buttons: [
@@ -101,12 +101,11 @@ const WhatsAppPage: React.FC = () => {
         ]
       };
     }
-
     return {
       id: Date.now().toString(),
       text: language === 'hi'
-        ? 'मैं आपकी बात समझ नहीं पाया। कृपया इनमें से कोई विकल्प चुनें या मुझसे पूछें:\n\n• कच्चे माल की कीमतें\n• ऑर्डर करना\n• डिलीवरी की जानकारी'
-        : 'I didn\'t understand that. Please choose from the options or ask me about:\n\n• Raw material prices\n• Placing orders\n• Delivery information',
+        ? 'मैं आपकी बात समझ नहीं पाया...'
+        : 'I didn\'t understand that...',
       sender: 'bot',
       timestamp: new Date(),
       buttons: [
@@ -124,9 +123,7 @@ const WhatsAppPage: React.FC = () => {
       sender: 'user',
       timestamp: new Date()
     };
-
     setMessages(prev => [...prev, userMessage]);
-
     setTimeout(() => {
       const botResponse = getBotResponse(action);
       setMessages(prev => [...prev, botResponse]);
@@ -140,100 +137,148 @@ const WhatsAppPage: React.FC = () => {
         showBack={true}
         rightAction={
           <div className="flex items-center space-x-2">
-            <button className="bg-white/20 hover:bg-white/30 rounded-lg p-2">
-              <Phone size={18} />
+            <button className="cursor-pointer bg-white/20 hover:bg-white/30 rounded-2xl p-3 transition-all duration-300 hover:scale-110">
+              <Phone size={20} />
             </button>
           </div>
         }
       />
 
-      {/* WhatsApp-style background */}
-      <div
-        className="flex-1 p-4 overflow-y-auto"
-        style={{
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cdefs%3E%3Cpattern id="whatsapp-bg" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"%3E%3Cpath d="M25 25h50v50h-50z" fill="none" stroke="%23e5e7eb" stroke-width="0.5" opacity="0.3"/%3E%3C/pattern%3E%3C/defs%3E%3Crect width="100" height="100" fill="url(%23whatsapp-bg)"/%3E%3C/svg%3E")',
-          backgroundColor: '#f0f2f5'
-        }}
-      >
-        <div className="space-y-4 max-w-md mx-auto">
-          {messages.map((message) => (
-            <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${message.sender === 'user'
-                ? 'bg-green-500 text-white rounded-br-md'
-                : 'bg-white text-gray-900 rounded-bl-md shadow-sm'
-                }`}>
-                <p className="whitespace-pre-line text-sm">{message.text}</p>
+      <div className="flex h-screen overflow-hidden">
+        {/* Optional sidebar here if needed */}
 
-                {message.buttons && (
-                  <div className="mt-3 space-y-2">
-                    {message.buttons.map((button, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleButtonClick(button.action, button.text)}
-                        className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
-                      >
-                        {button.text}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                <p className={`text-xs mt-2 ${message.sender === 'user' ? 'text-green-100' : 'text-gray-500'
-                  }`}>
-                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        <div className="hidden lg:block w-80 fixed left-0 h-full z-20 overflow-y-auto bg-white border-r border-gray-200 shadow-lg p-4">
+          <div className="p-6 border-b border-gray-100">
+            <div className="flex items-center space-x-4">
+              <div className="bg-gradient-to-br from-green-400 to-green-600 p-4 rounded-2xl shadow-lg">
+                <Bot className="text-white" size={32} />
+              </div>
+              <div>
+                <h3 className="font-bold text-xl text-gray-900">UdaanBazaar Bot</h3>
+                <p className="text-green-600 font-medium text-sm flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                  {language === 'hi' ? 'ऑनलाइन' : 'Online'}
                 </p>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Input Area */}
-      <div className="bg-white border-t border-gray-200 p-4">
-        <div className="max-w-md mx-auto flex items-center space-x-3">
-          <div className="flex-1 relative">
-            <input
-              type="text"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder={language === 'hi' ? 'मैसेज टाइप करें...' : 'Type a message...'}
-              className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-full focus:border-green-500 focus:outline-none"
-            />
-            <button className="absolute right-3 top-3 text-gray-400 hover:text-gray-600">
-              <Mic size={18} />
-            </button>
           </div>
 
-          <button
-            onClick={handleSendMessage}
-            disabled={!inputText.trim()}
-            className="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white p-3 rounded-full transition-colors"
-          >
-            <Send size={18} />
-          </button>
-        </div>
-      </div>
+          <div className="p-6 space-y-6">
+            <div>
+              <h4 className="font-bold text-gray-900 mb-3 flex items-center">
+                <Clock className="mr-2 text-orange-500" size={18} />
+                {language === 'hi' ? 'सेवा का समय' : 'Service Hours'}
+              </h4>
+              <div className="space-y-2 text-sm text-gray-600">
+                <p>{language === 'hi' ? 'सोमवार - शुक्रवार: 6:00 AM - 10:00 PM' : 'Monday - Friday: 6:00 AM - 10:00 PM'}</p>
+                <p>{language === 'hi' ? 'शनिवार - रविवार: 7:00 AM - 9:00 PM' : 'Saturday - Sunday: 7:00 AM - 9:00 PM'}</p>
+              </div>
+            </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white border-t border-gray-200 p-4">
-        <div className="max-w-md mx-auto">
-          <p className="text-gray-600 text-sm mb-3 text-center">
-            {language === 'hi' ? 'त्वरित प्रश्न:' : 'Quick questions:'}
-          </p>
-          <div className="flex flex-wrap gap-2 justify-center">
-            <button
-              onClick={() => handleButtonClick('potato_price', language === 'hi' ? 'आलू की कीमत' : 'Potato prices')}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-full text-sm transition-colors"
-            >
-              {language === 'hi' ? '🥔 आलू की कीमत' : '🥔 Potato prices'}
-            </button>
-            <button
-              onClick={() => handleButtonClick('onion_price', language === 'hi' ? 'प्याज की कीमत' : 'Onion prices')}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-full text-sm transition-colors"
-            >
-              {language === 'hi' ? '🧅 प्याज की कीमत' : '🧅 Onion prices'}
-            </button>
+            <div>
+              <h4 className="font-bold text-gray-900 mb-3">
+                {language === 'hi' ? '🏆 फीचर्स' : '🏆 Features'}
+              </h4>
+              <div className="space-y-3">
+                {[
+                  { icon: '💰', text: language === 'hi' ? 'रियल-टाइम कीमतें' : 'Real-time Prices' },
+                  { icon: '🚚', text: language === 'hi' ? 'तुरंत डिलीवरी' : 'Instant Delivery' },
+                  { icon: '📱', text: language === 'hi' ? 'ऑर्डर ट्रैकिंग' : 'Order Tracking' },
+                  { icon: '🎯', text: language === 'hi' ? 'बेस्ट डील्स' : 'Best Deals' }
+                ].map((feature, index) => (
+                  <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-xl">
+                    <span className="text-lg">{feature.icon}</span>
+                    <span className="text-gray-700 font-medium">{feature.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div className="flex-1 flex z-10 flex-col ml-0 lg:ml-80 h-screen">
+          {/* Background */}
+          <div className="absolute inset-0 opacity-20 pointer-events-none">
+            <div
+              className="h-full w-full"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='grid' width='60' height='60' patternUnits='userSpaceOnUse'%3E%3Cpath d='m 60 0 l 0 60 l -60 0 l 0 -60 z' fill='none' stroke='%23e5e7eb' strokeWidth='0.5'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grid)' /%3E%3C/svg%3E")`,
+                backgroundSize: '60px 60px'
+              }}
+            ></div>
+          </div>
+
+          {/* Scrollable Messages */}
+          <div className="relative z-10 flex-1 overflow-y-auto px-4 py-6 space-y-6 scroll-smooth">
+            {messages.map((msg) => (
+              <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-md px-6 py-4 rounded-3xl shadow-lg ${msg.sender === 'user'
+                  ? 'bg-gradient-to-br from-green-500 to-green-600 text-white rounded-br-lg ml-4'
+                  : 'bg-white text-gray-900 rounded-bl-lg mr-4 border border-gray-100'
+                  }`}>
+                  <div className="flex items-center space-x-3 mb-3">
+                    <div className={`p-2 rounded-full ${msg.sender === 'user' ? 'bg-white/20' : 'bg-orange-500'}`}>
+                      {msg.sender === 'user' ? (
+                        <User className="text-white" size={16} />
+                      ) : (
+                        <Bot className="text-white" size={16} />
+                      )}
+                    </div>
+                    <span className={`text-sm font-medium ${msg.sender === 'user' ? 'text-green-100' : 'text-gray-600'}`}>
+                      {msg.sender === 'user' ? (language === 'hi' ? 'आप' : 'You') : 'UdaanBazaar Bot'}
+                    </span>
+                  </div>
+                  <p className="whitespace-pre-line text-sm leading-relaxed">{msg.text}</p>
+                  {msg.buttons && (
+                    <div className="mt-4 space-y-2">
+                      {msg.buttons.map((btn, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleButtonClick(btn.action, btn.text)}
+                          className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-xl text-sm transition duration-300"
+                        >
+                          {btn.text}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex justify-between mt-3 text-xs">
+                    <span className={msg.sender === 'user' ? 'text-green-100' : 'text-gray-500'}>
+                      {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                    {msg.sender === 'user' && <CheckCheck className="text-green-200" size={16} />}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input Bar */}
+          <div className="bg-white border-t border-gray-200 p-4 sticky bottom-0 z-20">
+            <div className="max-w-4xl mx-auto flex items-center space-x-4">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  placeholder={language === 'hi' ? 'मैसेज टाइप करें...' : 'Type a message...'}
+                  className="w-full px-6 py-4 pr-14 border-2 border-gray-200 rounded-3xl focus:border-green-500 focus:outline-none transition-all bg-gray-50"
+                />
+                <button className="absolute right-4 top-4 text-gray-400 hover:text-gray-600">
+                  <Mic size={20} />
+                </button>
+              </div>
+              <button
+                onClick={handleSendMessage}
+                disabled={!inputText.trim()}
+                className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-full disabled:bg-gray-300 transition-all"
+              >
+                <Send size={20} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
